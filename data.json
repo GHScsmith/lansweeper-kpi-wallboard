@@ -1,35 +1,11 @@
 ﻿{
-    "generatedAt":  "2025-11-21 15:41:07",
+    "generatedAt":  "2025-11-21 16:01:27",
     "firstResponseByMonth":  {
                                  "labels":  [
-                                                "November 2024",
-                                                "December 2024",
-                                                "January 2025",
-                                                "February 2025",
-                                                "March 2025",
-                                                "April 2025",
-                                                "May 2025",
-                                                "June 2025",
-                                                "July 2025",
-                                                "August 2025",
-                                                "September 2025",
-                                                "October 2025",
-                                                "November 2025"
+
                                             ],
                                  "values":  [
-                                                0,
-                                                0,
-                                                -9.53,
-                                                0,
-                                                0,
-                                                -0.6,
-                                                0,
-                                                0,
-                                                0,
-                                                -1.78,
-                                                0,
-                                                0,
-                                                0
+
                                             ]
                              },
     "closedByMonth":  {
@@ -41,31 +17,9 @@
                                      ]
                       },
     "ticketsPerAgentLast7Days":  [
-                                     {
-                                         "count":  20,
-                                         "agent":  "CLOSINGPC"
-                                     },
-                                     {
-                                         "count":  19,
-                                         "agent":  "INSTALL"
-                                     },
-                                     {
-                                         "count":  5,
-                                         "agent":  ""
-                                     }
+
                                  ],
     "ticketsPerAgentThisMonth":  [
-                                     {
-                                         "count":  59,
-                                         "agent":  ""
-                                     },
-                                     {
-                                         "count":  58,
-                                         "agent":  "INSTALL"
-                                     },
-                                     {
-                                         "count":  43,
-                                         "agent":  "CLOSINGPC"
-                                     }
+
                                  ]
 }
