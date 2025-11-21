@@ -51,20 +51,46 @@
 
 <script>
 async function loadData() {
+  // cache-bust so Beam reloads fresh JSON
   const res = await fetch("data.json?v=" + Date.now());
   return res.json();
 }
 
-function makeLineChart(ctx, labels, data, label) {
+/**
+ * Creates a line chart with an SLA target line.
+ * @param {HTMLCanvasElement} ctx
+ * @param {string[]} labels
+ * @param {number[]} data
+ * @param {string} label
+ * @param {number} slaTarget
+ */
+function makeLineChart(ctx, labels, data, label, slaTarget) {
   return new Chart(ctx, {
     type: 'line',
     data: {
       labels,
-      datasets: [{ label, data, tension: .25 }]
+      datasets: [
+        {
+          label,
+          data,
+          borderWidth: 3,
+          tension: .25
+        },
+        {
+          label: "SLA Target",
+          data: labels.map(() => slaTarget),
+          borderWidth: 2,
+          borderColor: "red",
+          borderDash: [8, 6],
+          pointRadius: 0
+        }
+      ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color:"#e6edf7" } } },
+      plugins: {
+        legend: { labels: { color:"#e6edf7" } }
+      },
       scales: {
         x: { ticks: { color:"#9fb4d8" }, grid:{ color:"#1c2740"} },
         y: { ticks: { color:"#9fb4d8" }, grid:{ color:"#1c2740"} }
@@ -86,18 +112,22 @@ function fillTable(tableId, rows) {
 (async function init() {
   const data = await loadData();
 
+  // Initial response SLA target = 1 hour
   makeLineChart(
     document.getElementById("firstResponseChart"),
     data.firstResponseByMonth.labels,
     data.firstResponseByMonth.values,
-    "Avg Hours"
+    "Avg Hours",
+    1
   );
 
+  // Resolution/closed SLA target = 24 hours
   makeLineChart(
     document.getElementById("closedChart"),
     data.closedByMonth.labels,
     data.closedByMonth.values,
-    "Avg Hours"
+    "Avg Hours",
+    24
   );
 
   fillTable("#last7Table", data.ticketsPerAgentLast7Days);
@@ -106,6 +136,7 @@ function fillTable(tableId, rows) {
   document.getElementById("last7Updated").innerText = "Updated: " + data.generatedAt;
   document.getElementById("monthUpdated").innerText = "Updated: " + data.generatedAt;
 
+  // auto reload page every 5 min (helps with any player caching)
   setTimeout(() => location.reload(), 5 * 60 * 1000);
 })();
 </script>
