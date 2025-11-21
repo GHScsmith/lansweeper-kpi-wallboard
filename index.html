@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>GHS IT Helpdesk KPIs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: system-ui, Arial; margin: 0; background:#0b1220; color:#e6edf7; }
+    .wrap { display:grid; grid-template-columns: 1fr 1fr; gap:18px; padding:18px; }
+    .card { background:#121a2b; border-radius:14px; padding:16px; box-shadow:0 6px 22px rgba(0,0,0,.35); }
+    .card h2 { margin:0 0 8px 0; font-size:18px; color:#9fb4d8; font-weight:600; }
+    .big { font-size:36px; font-weight:800; letter-spacing:.3px; }
+    .sub { color:#9fb4d8; font-size:14px; margin-top:4px;}
+    canvas { width:100% !important; height:320px !important; }
+    table { width:100%; border-collapse: collapse; font-size:16px; }
+    th, td { padding:8px 6px; border-bottom:1px solid #24314a; text-align:left; }
+    th { color:#9fb4d8; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>Avg Time to Initial Response (Hours) — by Month</h2>
+      <canvas id="firstResponseChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Avg Time to Closed (Hours) — by Month</h2>
+      <canvas id="closedChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Tickets per Agent — Last 7 Days</h2>
+      <table id="last7Table">
+        <thead><tr><th>Agent</th><th>Tickets</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="sub" id="last7Updated"></div>
+    </div>
+
+    <div class="card">
+      <h2>Tickets per Agent — This Month</h2>
+      <table id="monthTable">
+        <thead><tr><th>Agent</th><th>Tickets</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="sub" id="monthUpdated"></div>
+    </div>
+  </div>
+
+<script>
+async function loadData() {
+  const res = await fetch("data.json?v=" + Date.now());
+  return res.json();
+}
+
+function makeLineChart(ctx, labels, data, label) {
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{ label, data, tension: .25 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color:"#e6edf7" } } },
+      scales: {
+        x: { ticks: { color:"#9fb4d8" }, grid:{ color:"#1c2740"} },
+        y: { ticks: { color:"#9fb4d8" }, grid:{ color:"#1c2740"} }
+      }
+    }
+  });
+}
+
+function fillTable(tableId, rows) {
+  const tb = document.querySelector(tableId + " tbody");
+  tb.innerHTML = "";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.agent}</td><td class="big" style="font-size:20px">${r.count}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+(async function init() {
+  const data = await loadData();
+
+  makeLineChart(
+    document.getElementById("firstResponseChart"),
+    data.firstResponseByMonth.labels,
+    data.firstResponseByMonth.values,
+    "Avg Hours"
+  );
+
+  makeLineChart(
+    document.getElementById("closedChart"),
+    data.closedByMonth.labels,
+    data.closedByMonth.values,
+    "Avg Hours"
+  );
+
+  fillTable("#last7Table", data.ticketsPerAgentLast7Days);
+  fillTable("#monthTable", data.ticketsPerAgentThisMonth);
+
+  document.getElementById("last7Updated").innerText = "Updated: " + data.generatedAt;
+  document.getElementById("monthUpdated").innerText = "Updated: " + data.generatedAt;
+
+  setTimeout(() => location.reload(), 5 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
